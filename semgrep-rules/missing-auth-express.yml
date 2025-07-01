@@ -1,0 +1,69 @@
+rules:
+  - id: missing-auth-middleware
+    languages: [javascript, typescript]
+    message: "⚠️ Missing authorization middleware in route"
+    severity: WARNING
+    patterns:
+      # Express route without middleware - app.get/post/put/delete etc.
+      - pattern: |
+          $APP.$METHOD($ROUTE, ($REQ, $RES) => {
+            ...
+          })
+      - pattern: |
+          $APP.$METHOD($ROUTE, function($REQ, $RES) {
+            ...
+          })
+      # Router route without middleware - router.get/post/put/delete etc.
+      - pattern: |
+          $ROUTER.$METHOD($ROUTE, ($REQ, $RES) => {
+            ...
+          })
+      - pattern: |
+          $ROUTER.$METHOD($ROUTE, function($REQ, $RES) {
+            ...
+          })
+      # Async route handlers without middleware
+      - pattern: |
+          $APP.$METHOD($ROUTE, async ($REQ, $RES) => {
+            ...
+          })
+      - pattern: |
+          $ROUTER.$METHOD($ROUTE, async ($REQ, $RES) => {
+            ...
+          })
+    # Exclude routes that already have middleware
+    pattern-not-inside:
+      - pattern: |
+          $APP.$METHOD($ROUTE, $MIDDLEWARE, ...)
+      - pattern: |
+          $ROUTER.$METHOD($ROUTE, $MIDDLEWARE, ...)
+      - pattern: |
+          $APP.$METHOD($ROUTE, [$MIDDLEWARE, ...], ...)
+      - pattern: |
+          $ROUTER.$METHOD($ROUTE, [$MIDDLEWARE, ...], ...)
+    # Exclude common public routes that typically don't need auth
+    pattern-not:
+      - pattern: |
+          $APP.$METHOD("/", ...)
+      - pattern: |
+          $APP.$METHOD("/health", ...)
+      - pattern: |
+          $APP.$METHOD("/status", ...)
+      - pattern: |
+          $APP.$METHOD("/ping", ...)
+      - pattern: |
+          $APP.$METHOD("/login", ...)
+      - pattern: |
+          $APP.$METHOD("/register", ...)
+      - pattern: |
+          $APP.$METHOD("/public", ...)
+    metadata:
+      category: security
+      subcategory: missing-auth
+      technology:
+        - express
+        - nodejs
+      references:
+        - https://expressjs.com/en/guide/using-middleware.html
+      cwe: "CWE-862: Missing Authorization"
+      owasp: "A01:2021 - Broken Access Control"

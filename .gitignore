@@ -1,0 +1,19 @@
+out
+dist
+node_modules
+.vscode-test/
+*.vsix
+
+# Python virtual environment
+.venv/
+
+# Test files
+test-*.js
+test-*.ts
+test-*.py
+test-*.json
+test-*.txt
+test-vulnerable-code.*
+test-phase*.*
+test-routes.*
+test-views.*
