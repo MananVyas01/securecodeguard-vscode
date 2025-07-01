@@ -60,19 +60,6 @@ export function activate(context: vscode.ExtensionContext) {
 		)
 	);
 
-	// Register the Hello World command
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	const helloWorldCommand = vscode.commands.registerCommand('securecodeguard.helloWorld', () => {
-		// The code you place here will be executed every time your command is executed
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World from SecureCodeGuard!');
-	});
-
-	// Add the command to the extension's subscriptions so it gets disposed when the extension is deactivated
-	context.subscriptions.push(helloWorldCommand);
-
 	// Phase 6: Register the re-scan command for automatic Semgrep re-run after fixes
 	const rescanAfterFixCommand = vscode.commands.registerCommand('secureCodeGuard.rescanAfterFix', (document: vscode.TextDocument) => {
 		// Run Semgrep on the specific document after a fix is applied
