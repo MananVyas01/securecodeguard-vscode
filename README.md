@@ -111,15 +111,7 @@ code .
 
 ## Demo Video
 
-*[Demo video will be added here - See DEMO-PLAN.md for recording structure]*
-
-Brief walkthrough:
-1. Introduction and plugin overview
-2. Hardcoded secret detection and quick fix
-3. Authorization gap detection in Express.js routes
-4. Dependency vulnerability analysis
-5. Problems tab integration and workflow
-6. Architecture overview and future enhancements
+*[Demo video will be added here]*
 
 ## Development Status
 
