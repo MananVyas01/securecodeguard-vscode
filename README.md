@@ -38,8 +38,8 @@ SecureCodeGuard is an intelligent VS Code extension that provides real-time secu
 ### **1. Install & Setup**
 ```bash
 # Method 1: Development Mode (Recommended for testing)
-git clone <your-repo-url>
-cd vs-secure-code-plugin
+git clone https://github.com/MananVyas01/securecodeguard-vscode.git
+cd securecodeguard-vscode
 npm install
 code .
 # Press F5 to launch Extension Development Host
@@ -222,8 +222,8 @@ We welcome contributions! Please see our testing guide for comprehensive validat
 
 ### **Development Setup**
 ```bash
-git clone <repository-url>
-cd vs-secure-code-plugin
+git clone https://github.com/MananVyas01/securecodeguard-vscode.git
+cd securecodeguard-vscode
 npm install
 code .
 # Press F5 to start Extension Development Host
