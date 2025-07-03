@@ -20,3 +20,7 @@ test-vulnerable-code.*
 test-phase*.*
 test-routes.*
 test-views.*
+
+# Demo and development documentation
+DEMO-PLAN.md
+FINAL-POLISH.md
