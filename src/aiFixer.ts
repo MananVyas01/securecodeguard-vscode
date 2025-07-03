@@ -9,6 +9,10 @@
 import { OpenAI } from 'openai';
 import Groq from 'groq-sdk';
 import * as vscode from 'vscode';
+import * as dotenv from 'dotenv';
+
+// Load environment variables from .env file
+dotenv.config();
 
 /**
  * Initialize AI clients with API keys from environment variables or VS Code settings

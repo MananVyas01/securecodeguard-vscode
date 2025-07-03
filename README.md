@@ -71,8 +71,9 @@ code .
 ### Usage
 
 1. **Configure AI Services (Optional):**
-   - Set OpenAI API key: `Ctrl+Shift+P` → "Preferences: Open Settings" → Search "SecureCodeGuard"
-   - Set Groq API key for alternative AI engine
+   - **VS Code Settings**: `Ctrl+Shift+P` → "Preferences: Open Settings" → Search "SecureCodeGuard"
+   - **Environment File**: Copy `.env.example` to `.env` and add your API keys
+   - Set OpenAI and/or Groq API keys for AI-powered fixes
    
 2. **Scan for Security Issues:**
    - Open any supported code file in VS Code
@@ -103,13 +104,25 @@ code .
 - **Export Data**: Export metrics for reporting and analysis
 
 ### Configuration
-Set your AI API keys in VS Code settings:
+Set your AI API keys using one of these methods:
+
+**Option 1: VS Code Settings (Recommended)**
 ```json
 {
   "secureCodeGuard.openaiApiKey": "your-openai-key",
   "secureCodeGuard.groqApiKey": "your-groq-key"
 }
 ```
+
+**Option 2: Environment Variables (.env file)**
+1. Copy `.env.example` to `.env`
+2. Add your API keys:
+```bash
+OPENAI_API_KEY=sk-your-openai-api-key-here
+GROQ_API_KEY=gsk_your-groq-api-key-here
+```
+
+**⚠️ Security Note:** Never commit `.env` files with real API keys to version control!
 
 ## Folder Structure
 

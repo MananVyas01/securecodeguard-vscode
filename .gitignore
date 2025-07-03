@@ -7,6 +7,9 @@ node_modules
 # Python virtual environment
 .venv/
 
+# Environment variables (API keys)
+.env
+
 # Test files
 test-*.js
 test-*.ts
