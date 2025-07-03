@@ -1,0 +1,87 @@
+rules:
+  # Hardcoded Secrets Detection
+  - id: hardcoded-api-key
+    pattern-either:
+      - pattern: const API_KEY = "..."
+      - pattern: const $API_KEY = "..."
+      - pattern: let API_KEY = "..."
+      - pattern: let $API_KEY = "..."
+      - pattern: var API_KEY = "..."
+      - pattern: var $API_KEY = "..."
+    message: "Hardcoded API key detected. Store secrets in environment variables."
+    languages: [javascript, typescript]
+    severity: WARNING
+    metadata:
+      category: security
+      subcategory: secrets
+
+  - id: hardcoded-password
+    pattern-either:
+      - pattern: const PASSWORD = "..."
+      - pattern: const $PASSWORD = "..."
+      - pattern: let PASSWORD = "..."
+      - pattern: let $PASSWORD = "..."
+      - pattern: var PASSWORD = "..."
+      - pattern: var $PASSWORD = "..."
+      - pattern: $VAR = "...password..."
+    message: "Hardcoded password detected. Use secure configuration."
+    languages: [javascript, typescript]
+    severity: WARNING
+    metadata:
+      category: security
+      subcategory: secrets
+
+  # XSS Vulnerabilities
+  - id: xss-vulnerability
+    pattern-either:
+      - pattern: $ELEMENT.innerHTML = $USER_INPUT
+      - pattern: document.getElementById(...).innerHTML = $USER_INPUT
+      - pattern: document.querySelector(...).innerHTML = $USER_INPUT
+    message: "Potential XSS vulnerability. Use textContent instead of innerHTML."
+    languages: [javascript, typescript]
+    severity: WARNING
+    metadata:
+      category: security
+      subcategory: xss
+
+  # Code Injection
+  - id: code-injection
+    pattern-either:
+      - pattern: eval($INPUT)
+      - pattern: eval("..." + $INPUT + "...")
+    message: "Use of eval() is dangerous and can lead to code injection attacks."
+    languages: [javascript, typescript]
+    severity: ERROR
+    metadata:
+      category: security
+      subcategory: injection
+
+  # Insecure Random
+  - id: insecure-random
+    pattern-either:
+      - pattern: Math.random()
+      - pattern: Math.random().toString(...)
+    message: "Math.random() is not cryptographically secure. Use crypto.getRandomValues()."
+    languages: [javascript, typescript]
+    severity: WARNING
+    metadata:
+      category: security
+      subcategory: crypto
+
+  # Missing Authentication in Express Routes
+  - id: missing-auth-express
+    pattern-either:
+      - pattern: |
+          app.get('/admin', ...)
+      - pattern: |
+          app.post('/admin', ...)
+      - pattern: |
+          app.get('/api/$ENDPOINT', ...)
+      - pattern: |
+          app.post('/api/$ENDPOINT', ...)
+    message: "Route may be missing authentication middleware. Add auth checks."
+    languages: [javascript, typescript]
+    severity: WARNING
+    metadata:
+      category: security
+      subcategory: auth
