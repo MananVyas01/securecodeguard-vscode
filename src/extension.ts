@@ -15,6 +15,7 @@ import * as path from 'path';
 import { SecureCodeActionProvider } from './codeActions';
 import { initializeSemgrepRunner, runSemgrepOnDocument } from './semgrepRunner';
 import { checkVulnerableLibraries } from './dependencyChecker';
+import { initializeMetrics, showMetricsDialog, getMetricsSummary } from './metrics';
 
 // Create a diagnostic collection for SecureCodeGuard
 let diagnosticCollection: vscode.DiagnosticCollection;
@@ -40,6 +41,9 @@ export function activate(context: vscode.ExtensionContext) {
 
 	// Initialize the semgrep runner with the diagnostic collection and extension context
 	initializeSemgrepRunner(diagnosticCollection, context);
+	
+	// Initialize the metrics system
+	initializeMetrics(context);
 
 	// Phase 5: Register Code Action Provider for quick fixes
 	// This enables the lightbulb 💡 feature for security fixes
@@ -66,6 +70,27 @@ export function activate(context: vscode.ExtensionContext) {
 		runSemgrepOnDocument(document);
 	});
 	context.subscriptions.push(rescanAfterFixCommand);
+	
+	// Phase 10: Register AI-powered fix commands
+	const applyAIFixCommand = vscode.commands.registerCommand('secureCodeGuard.applyAIFix', 
+		(document: vscode.TextDocument, range: vscode.Range, engine: 'openai' | 'groq') => {
+			SecureCodeActionProvider.applyAIFix(document, range, engine);
+		}
+	);
+	context.subscriptions.push(applyAIFixCommand);
+	
+	const applyManualFixCommand = vscode.commands.registerCommand('secureCodeGuard.applyManualFix',
+		(document: vscode.TextDocument, range: vscode.Range, issueType: string, edit: vscode.WorkspaceEdit) => {
+			SecureCodeActionProvider.applyManualFix(document, range, issueType, edit);
+		}
+	);
+	context.subscriptions.push(applyManualFixCommand);
+	
+	// Register view stats command
+	const viewStatsCommand = vscode.commands.registerCommand('secureCodeGuard.viewStats', () => {
+		showMetricsDialog();
+	});
+	context.subscriptions.push(viewStatsCommand);
 
 	// Phase 2 & 3 & 4: Listen to file save events, run Semgrep scan, and show inline diagnostics
 	// Add an event listener that triggers whenever a file is saved

@@ -36,7 +36,29 @@
   ],
   "main": "./out/extension.js",
   "contributes": {
-    "commands": []
+    "commands": [
+      {
+        "command": "secureCodeGuard.viewStats",
+        "title": "SecureCodeGuard: View Security Statistics"
+      }
+    ],
+    "configuration": {
+      "title": "SecureCodeGuard",
+      "properties": {
+        "secureCodeGuard.openaiApiKey": {
+          "type": "string",
+          "default": "",
+          "description": "OpenAI API key for AI-powered security fixes",
+          "scope": "application"
+        },
+        "secureCodeGuard.groqApiKey": {
+          "type": "string", 
+          "default": "",
+          "description": "Groq API key for AI-powered security fixes",
+          "scope": "application"
+        }
+      }
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",

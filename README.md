@@ -13,6 +13,8 @@ SecureCodeGuard is a developer-friendly VS Code plugin that scans your code and 
 - **Authorization Checks**: Identifies routes or controller functions lacking authorization middleware
 - **Dependency Analysis**: Scans `package.json` and `requirements.txt` for outdated or vulnerable dependencies
 - **Quick Fixes**: Offers one-click fixes through VS Code's Code Actions (lightbulb)
+- **AI-Powered Fixes**: Intelligent security refactoring using OpenAI GPT-3.5 or Groq Llama3
+- **Scan Intelligence**: Tracks security metrics, fix rates, and provides analytics
 - **Automatic Re-validation**: Re-runs scans automatically after code fixes
 
 ## How It Works
@@ -68,11 +70,46 @@ code .
 
 ### Usage
 
-1. Open any supported code file in VS Code
-2. Save the file to trigger automatic security scanning
-3. Review security issues in the Problems tab or inline diagnostics
-4. Click the lightbulb icon (💡) for quick fixes
-5. Apply fixes and watch automatic re-scan confirm resolution
+1. **Configure AI Services (Optional):**
+   - Set OpenAI API key: `Ctrl+Shift+P` → "Preferences: Open Settings" → Search "SecureCodeGuard"
+   - Set Groq API key for alternative AI engine
+   
+2. **Scan for Security Issues:**
+   - Open any supported code file in VS Code
+   - Save the file to trigger automatic security scanning
+   - Review security issues in the Problems tab or inline diagnostics
+
+3. **Apply Fixes:**
+   - Click the lightbulb icon (💡) for quick fixes
+   - Choose between manual fixes or AI-powered solutions
+   - Watch automatic re-scan confirm resolution
+
+4. **View Analytics:**
+   - Run `SecureCodeGuard: View Security Statistics` from Command Palette
+   - Track fix rates, issue types, and scan history
+
+## AI-Powered Security Intelligence
+
+### AI Fix Engines
+- **OpenAI GPT-3.5 Turbo**: Advanced reasoning for complex security refactoring
+- **Groq Llama3**: Fast, efficient AI fixes with excellent code understanding
+- **Smart Issue Detection**: Automatically identifies issue types for targeted AI prompts
+
+### Scan Metrics & Analytics
+- **Fix Rate Tracking**: Monitor percentage of issues resolved
+- **Issue Type Analytics**: Understand your most common security patterns
+- **AI vs Manual Fixes**: Compare effectiveness of different fix methods
+- **Scan History**: Track security improvements over time
+- **Export Data**: Export metrics for reporting and analysis
+
+### Configuration
+Set your AI API keys in VS Code settings:
+```json
+{
+  "secureCodeGuard.openaiApiKey": "your-openai-key",
+  "secureCodeGuard.groqApiKey": "your-groq-key"
+}
+```
 
 ## Folder Structure
 
@@ -87,7 +124,9 @@ code .
   ├── extension.ts           # Activation and main scanning logic
   ├── codeActions.ts         # Code fix suggestions and quick actions
   ├── semgrepRunner.ts       # Executes and parses Semgrep results
-  └── dependencyChecker.ts   # Dependency vulnerability analysis
+  ├── dependencyChecker.ts   # Dependency vulnerability analysis
+  ├── aiFixer.ts             # AI-powered security refactoring
+  └── metrics.ts             # Scan intelligence and analytics
 ```
 
 ## Security Patterns Detected
@@ -120,6 +159,8 @@ This extension currently supports comprehensive static security analysis for mul
 - ✅ Real-time Semgrep integration
 - ✅ Inline diagnostics and visual feedback  
 - ✅ One-click security fixes
+- ✅ AI-powered intelligent refactoring (OpenAI + Groq)
+- ✅ Scan metrics and analytics tracking
 - ✅ Automatic re-validation
 - ✅ Dependency vulnerability detection
 - ✅ Authorization gap detection

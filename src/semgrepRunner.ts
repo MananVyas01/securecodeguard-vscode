@@ -11,6 +11,7 @@
 import * as vscode from 'vscode';
 import * as cp from 'child_process';
 import * as path from 'path';
+import { recordIssueDetected, recordScanSession } from './metrics';
 
 // Get the diagnostic collection (will be passed from extension.ts)
 let diagnosticCollection: vscode.DiagnosticCollection;
@@ -149,11 +150,11 @@ function processSemgrepResults(document: vscode.TextDocument, results: any): voi
 				severity
 			);
 			
-			// Add additional metadata
-			diagnostic.source = 'SecureCodeGuard';
-			diagnostic.code = issue.check_id;
-			
+			// Add to diagnostics array
 			diagnostics.push(diagnostic);
+			
+			// Record the issue detection in metrics
+			recordIssueDetected(issue.check_id, path.basename(document.fileName));
 		});
 		
 		// Set diagnostics for this file
@@ -171,6 +172,9 @@ function processSemgrepResults(document: vscode.TextDocument, results: any): voi
 		vscode.window.showInformationMessage('✅ All security issues resolved! Great job!');
 		console.log('✅ Re-scan completed - all issues resolved');
 	}
+	
+	// Record the scan session with issue count
+	recordScanSession(path.basename(document.fileName), diagnostics.length);
 }
 
 /**

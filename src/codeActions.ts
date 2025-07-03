@@ -9,6 +9,8 @@
  */
 
 import * as vscode from 'vscode';
+import { getSecureRefactor, checkAIAvailability } from './aiFixer';
+import { recordIssueFixed } from './metrics';
 
 /**
  * Code Action Provider for SecureCodeGuard security fixes
@@ -67,6 +69,19 @@ export class SecureCodeActionProvider implements vscode.CodeActionProvider {
 		// Check for insecure random
 		if (this.containsInsecureRandom(text) || this.containsInsecureRandom(lineText)) {
 			actions.push(this.createInsecureRandomFix(document, range));
+		}
+
+		// Add AI-powered fix options if any vulnerability is detected
+		if (actions.length > 0) {
+			const aiAvailability = checkAIAvailability();
+			
+			if (aiAvailability.openai) {
+				actions.push(this.createAIFix(document, range, 'openai'));
+			}
+			
+			if (aiAvailability.groq) {
+				actions.push(this.createAIFix(document, range, 'groq'));
+			}
 		}
 
 		return actions;
@@ -279,5 +294,107 @@ export class SecureCodeActionProvider implements vscode.CodeActionProvider {
 		};
 
 		return fix;
+	}
+
+	/**
+	 * Create an AI-powered fix for any detected security issue
+	 */
+	private createAIFix(document: vscode.TextDocument, range: vscode.Range, engine: 'openai' | 'groq'): vscode.CodeAction {
+		const engineName = engine === 'openai' ? 'OpenAI' : 'Groq';
+		const fix = new vscode.CodeAction(`🤖 Fix with ${engineName} AI`, vscode.CodeActionKind.QuickFix);
+		
+		// Create a command that will trigger the AI fix
+		fix.command = {
+			title: `Fix with ${engineName}`,
+			command: 'secureCodeGuard.applyAIFix',
+			arguments: [document, range, engine]
+		};
+
+		return fix;
+	}
+
+	/**
+	 * Apply AI-powered fix to the code
+	 */
+	public static async applyAIFix(document: vscode.TextDocument, range: vscode.Range, engine: 'openai' | 'groq'): Promise<void> {
+		try {
+			const originalCode = document.getText(range);
+			const issueType = SecureCodeActionProvider.detectIssueType(originalCode);
+			
+			// Show progress
+			const fixedCode = await vscode.window.withProgress({
+				location: vscode.ProgressLocation.Notification,
+				title: `🤖 Generating secure fix with ${engine.toUpperCase()}...`,
+				cancellable: false
+			}, async () => {
+				return await getSecureRefactor(originalCode, issueType, engine);
+			});
+
+			if (fixedCode && fixedCode.trim()) {
+				// Apply the fix
+				const edit = new vscode.WorkspaceEdit();
+				edit.replace(document.uri, range, fixedCode);
+				
+				const success = await vscode.workspace.applyEdit(edit);
+				
+				if (success) {
+					// Record the fix in metrics
+					recordIssueFixed(issueType, 'ai', engine);
+					
+					vscode.window.showInformationMessage(`✅ AI fix applied successfully using ${engine.toUpperCase()}!`);
+					
+					// Trigger re-scan
+					vscode.commands.executeCommand('secureCodeGuard.rescanAfterFix', document);
+				} else {
+					vscode.window.showErrorMessage('Failed to apply AI-generated fix.');
+				}
+			} else {
+				vscode.window.showWarningMessage(`${engine.toUpperCase()} could not generate a fix for this security issue.`);
+			}
+		} catch (error: any) {
+			vscode.window.showErrorMessage(`AI fix failed: ${error.message}`);
+		}
+	}
+
+	/**
+	 * Apply a manual fix and record it in metrics
+	 */
+	public static async applyManualFix(
+		document: vscode.TextDocument, 
+		range: vscode.Range, 
+		issueType: string, 
+		edit: vscode.WorkspaceEdit
+	): Promise<void> {
+		const success = await vscode.workspace.applyEdit(edit);
+		
+		if (success) {
+			// Record the fix in metrics
+			recordIssueFixed(issueType, 'manual');
+			
+			// Trigger re-scan
+			vscode.commands.executeCommand('secureCodeGuard.rescanAfterFix', document);
+		}
+	}
+
+	/**
+	 * Detect the type of security issue from code content
+	 */
+	private static detectIssueType(code: string): string {
+		if (/API_KEY\s*=\s*["']|api_key\s*=\s*["']/i.test(code)) {
+			return 'hardcoded-secrets';
+		}
+		if (/PASSWORD\s*=\s*["']|password\s*=\s*["']/i.test(code)) {
+			return 'hardcoded-secrets';
+		}
+		if (/\.innerHTML\s*=/.test(code)) {
+			return 'xss-vulnerability';
+		}
+		if (/eval\s*\(/.test(code)) {
+			return 'code-injection';
+		}
+		if (/Math\.random\s*\(\)/.test(code)) {
+			return 'insecure-random';
+		}
+		return 'security-issue';
 	}
 }
