@@ -10,7 +10,7 @@ node_modules
 # Environment variables (API keys)
 .env
 
-# Test files
+# Test files - Development testing only
 test-*.js
 test-*.ts
 test-*.py
@@ -21,3 +21,32 @@ test-phase*.*
 test-routes.*
 test-views.*
 
+# Demo and development files
+quick-test.js
+clean-test.js
+ai-ml-demo.js
+test-ai-config.js
+test-ai-fixes.js
+test-ai-ml-demo.js
+test-clean-package.json
+test-quick-test.js
+
+# Development documentation (uncomment to keep)
+# DEMO-PLAN.md
+# FINAL-POLISH.md
+# AI-ML-ENHANCEMENT-SUMMARY.md
+
+# Keep important documentation in repo
+# TESTING-GUIDE.md
+# AI-RELIABILITY-IMPROVEMENTS.md
+# README-AI-ML.md
+
+# Development summaries and temporary files
+*-summary.md
+temp-*.js
+dev-*.js
+temp-*.*
+
+# VS Code workspace files
+.vscode/launch.json
+.vscode/tasks.json

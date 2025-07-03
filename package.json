@@ -40,6 +40,18 @@
       {
         "command": "secureCodeGuard.viewStats",
         "title": "SecureCodeGuard: View Security Statistics"
+      },
+      {
+        "command": "secureCodeGuard.aiDashboard",
+        "title": "SecureCodeGuard: AI/ML Intelligence Dashboard"
+      },
+      {
+        "command": "secureCodeGuard.runMLAnalysis",
+        "title": "SecureCodeGuard: Run AI/ML Security Analysis"
+      },
+      {
+        "command": "secureCodeGuard.configureAI",
+        "title": "SecureCodeGuard: Configure AI API Keys"
       }
     ],
     "configuration": {
