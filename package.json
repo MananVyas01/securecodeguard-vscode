@@ -68,6 +68,25 @@
           "default": "",
           "description": "Groq API key for AI-powered security fixes",
           "scope": "application"
+        },
+        "secureCodeGuard.aiProvider": {
+          "type": "string",
+          "enum": ["openai", "groq", "ollama"],
+          "default": "openai",
+          "description": "Choose the AI provider for generating fixes.",
+          "scope": "application"
+        },
+        "secureCodeGuard.ollamaEndpoint": {
+          "type": "string",
+          "default": "http://localhost:11434",
+          "description": "Local endpoint for Ollama (if provider is set to ollama).",
+          "scope": "application"
+        },
+        "secureCodeGuard.ollamaModel": {
+          "type": "string",
+          "default": "dolphincoder:15b",
+          "description": "The local Ollama model to use (e.g., dolphincoder:15b, mistral:latest).",
+          "scope": "application"
         }
       }
     }

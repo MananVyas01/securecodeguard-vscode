@@ -13,6 +13,7 @@ SecureCodeGuard is a cutting-edge Visual Studio Code extension that leverages **
 - **Ensemble Learning**: Multiple AI models working together for higher accuracy
 
 ### 🤖 **AI-Powered Automated Fixes**
+- **100% Privacy Preserving Mode**: Complete local offline AI execution using Ollama (Llama 3/Code Llama).
 - **OpenAI Integration**: GPT-powered security refactoring
 - **Groq Integration**: Lightning-fast AI fixes with Llama models
 - **ML-Enhanced Prompting**: Context-aware AI prompts for better fixes

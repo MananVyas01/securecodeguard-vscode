@@ -262,20 +262,20 @@ function validateAIResponseStrict(original: string, fixed: string): boolean {
  * 
  * @param code - The vulnerable code to fix
  * @param issueType - Type of security issue detected
- * @param engine - AI engine to use ('openai' or 'groq')
+ * @param engine - AI engine to use ('openai', 'groq', or 'ollama')
  * @param useAIFirst - Whether to try AI first or fallback immediately to manual fix
  * @returns Promise<string> - Fixed code or empty string if failed
  */
 export async function getSecureRefactor(
     code: string, 
     issueType: string = 'security-issue',
-    engine: 'openai' | 'groq' = 'openai',
+    engine: 'openai' | 'groq' | 'ollama' = 'openai',
     useAIFirst: boolean = true
 ): Promise<string> {
     const detectedIssueType = detectIssueTypeFromCode(code);
     
-    // Try manual fix first if AI is disabled or if requested
-    if (!useAIFirst || !checkAIAvailability()[engine]) {
+    // Try manual fix first if AI is disabled or if requested (skip check for ollama specifically, assume available)
+    if (!useAIFirst || (engine !== 'ollama' && !checkAIAvailability()[engine as keyof ReturnType<typeof checkAIAvailability>])) {
         const manualFix = applyManualFix(code, detectedIssueType);
         if (manualFix) {
             console.log('Applied manual fix for:', detectedIssueType);
@@ -343,7 +343,28 @@ Output: element.textContent = userInput;`
     try {
         let response: string = '';
 
-        if (engine === 'groq' && groq) {
+        if (engine === 'ollama') {
+            const config = vscode.workspace.getConfiguration('secureCodeGuard');
+            const endpoint = config.get<string>('ollamaEndpoint', 'http://localhost:11434');
+            const ollamaModel = config.get<string>('ollamaModel', 'dolphincoder:15b');
+            
+            const systemPrompt = messages[0].content;
+            const fullPrompt = `${systemPrompt}\n\nTask:\n${prompt}`;
+            
+            const res = await fetch(`${endpoint}/api/generate`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    model: ollamaModel,
+                    prompt: fullPrompt,
+                    stream: false
+                })
+            });
+
+            if (!res.ok) throw new Error('Ollama API failed');
+            const data = await res.json() as { response: string };
+            response = data.response;
+        } else if (engine === 'groq' && groq) {
             const res = await groq.chat.completions.create({
                 model,
                 messages,
@@ -667,11 +688,12 @@ function validateAIResponse(original: string, fixed: string): boolean {
 /**
  * Check if AI services are available
  */
-export function checkAIAvailability(): { openai: boolean; groq: boolean } {
+export function checkAIAvailability(): { openai: boolean; groq: boolean; ollama: boolean } {
     const { openai, groq } = initializeClients();
     return {
         openai: !!openai,
-        groq: !!groq
+        groq: !!groq,
+        ollama: true // Assuming local Ollama is always conceptually available for attempts
     };
 }
 

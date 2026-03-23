@@ -16,7 +16,8 @@ SecureCodeGuard is an intelligent VS Code extension that provides real-time secu
 - **Visual Feedback**: Red squiggles and Problems panel integration
 
 ### 🧠 **AI-Powered Intelligent Fixes**
-- **Dual AI Engines**: OpenAI GPT-3.5 Turbo + Groq Llama3
+- **100% Privacy Preserving Mode**: Run entirely offline using local LLMs via Ollama. Your code never leaves your machine!
+- **Dual Cloud AI Engines**: OpenAI GPT-3.5 Turbo + Groq Llama3 for hosted high-performance fixes.
 - **Smart Fallback**: AI tries first, falls back to reliable manual fixes
 - **Context-Aware**: Understands code context for better suggestions
 - **Quality Validation**: Multi-layer validation ensures fix quality

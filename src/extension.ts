@@ -78,7 +78,7 @@ export function activate(context: vscode.ExtensionContext) {
 	
 	// Phase 10: Register AI-powered fix commands
 	const applyAIFixCommand = vscode.commands.registerCommand('secureCodeGuard.applyAIFix', 
-		(document: vscode.TextDocument, range: vscode.Range, engine: 'openai' | 'groq', useAIFirst: boolean = true) => {
+		(document: vscode.TextDocument, range: vscode.Range, engine: 'openai' | 'groq' | 'ollama', useAIFirst: boolean = true) => {
 			SecureCodeActionProvider.applyAIFix(document, range, engine, useAIFirst);
 		}
 	);

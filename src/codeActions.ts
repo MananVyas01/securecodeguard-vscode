@@ -74,14 +74,23 @@ export class SecureCodeActionProvider implements vscode.CodeActionProvider {
 		// Add AI-powered fix options if any vulnerability is detected
 		if (actions.length > 0) {
 			const aiAvailability = checkAIAvailability();
+			const config = vscode.workspace.getConfiguration('secureCodeGuard');
+			const aiProvider = config.get<string>('aiProvider', 'openai');
+			
+			// Determine which engine to use based on settings and availability
+			let defaultEngine: 'openai' | 'groq' | 'ollama' = 'openai';
+			if (aiProvider === 'ollama') defaultEngine = 'ollama';
+			else if (aiProvider === 'groq' && aiAvailability.groq) defaultEngine = 'groq';
+			else if (aiProvider === 'openai' && aiAvailability.openai) defaultEngine = 'openai';
+			else if (aiAvailability.ollama) defaultEngine = 'ollama'; // Fallback to local
 			
 			// Add a general SecureCodeGuard AI fix option with fallback
-			if (aiAvailability.openai || aiAvailability.groq) {
-				const generalAIFix = new vscode.CodeAction('🧠 Fix using SecureCodeGuard AI (Smart)', vscode.CodeActionKind.QuickFix);
+			if (aiAvailability.openai || aiAvailability.groq || aiAvailability.ollama) {
+				const generalAIFix = new vscode.CodeAction(`🧠 Fix using SecureCodeGuard AI (Smart - ${defaultEngine})`, vscode.CodeActionKind.QuickFix);
 				generalAIFix.command = {
 					title: 'Fix using SecureCodeGuard AI (Smart)',
 					command: 'secureCodeGuard.applyAIFix',
-					arguments: [document, range, aiAvailability.openai ? 'openai' : 'groq', true] // useAIFirst = true
+					arguments: [document, range, defaultEngine, true] // useAIFirst = true
 				};
 				actions.push(generalAIFix);
 				
@@ -90,7 +99,7 @@ export class SecureCodeActionProvider implements vscode.CodeActionProvider {
 				manualFirstFix.command = {
 					title: 'Fix using Manual Rules (Reliable)',
 					command: 'secureCodeGuard.applyAIFix',
-					arguments: [document, range, aiAvailability.openai ? 'openai' : 'groq', false] // useAIFirst = false
+					arguments: [document, range, defaultEngine, false] // useAIFirst = false
 				};
 				actions.push(manualFirstFix);
 			} else {
@@ -104,6 +113,9 @@ export class SecureCodeActionProvider implements vscode.CodeActionProvider {
 			}
 			
 			// Add specific engine options
+			if (aiAvailability.ollama) {
+				actions.push(this.createAIFix(document, range, 'ollama'));
+			}
 			if (aiAvailability.openai) {
 				actions.push(this.createAIFix(document, range, 'openai'));
 			}
@@ -328,8 +340,8 @@ export class SecureCodeActionProvider implements vscode.CodeActionProvider {
 	/**
 	 * Create an AI-powered fix for any detected security issue
 	 */
-	private createAIFix(document: vscode.TextDocument, range: vscode.Range, engine: 'openai' | 'groq'): vscode.CodeAction {
-		const engineName = engine === 'openai' ? 'OpenAI' : 'Groq';
+	private createAIFix(document: vscode.TextDocument, range: vscode.Range, engine: 'openai' | 'groq' | 'ollama'): vscode.CodeAction {
+		const engineName = engine === 'openai' ? 'OpenAI' : (engine === 'groq' ? 'Groq' : 'Local Ollama');
 		const fix = new vscode.CodeAction(`🧠 Fix using SecureCodeGuard AI (${engineName})`, vscode.CodeActionKind.QuickFix);
 		
 		// Create a command that will trigger the AI fix
@@ -348,7 +360,7 @@ export class SecureCodeActionProvider implements vscode.CodeActionProvider {
 	public static async applyAIFix(
 		document: vscode.TextDocument, 
 		range: vscode.Range, 
-		engine: 'openai' | 'groq',
+		engine: 'openai' | 'groq' | 'ollama',
 		useAIFirst: boolean = true
 	): Promise<void> {
 		try {
@@ -392,7 +404,7 @@ export class SecureCodeActionProvider implements vscode.CodeActionProvider {
 				
 				if (success) {
 					// Record the fix in metrics
-					recordIssueFixed(issueType, useAIFirst ? 'ai' : 'manual', engine);
+					recordIssueFixed(issueType, useAIFirst ? 'ai' : 'manual', engine as any);
 					
 					vscode.window.showInformationMessage(`✅ SecureCodeGuard fix applied successfully using ${useAIFirst ? `AI (${engine.toUpperCase()})` : 'Manual Rules'}!`);
 					
